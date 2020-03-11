@@ -25,10 +25,11 @@
 #'   file names.
 #' @examples
 #' \dontrun{
-#' out <- MergeIndividualFiles(fileDirectory = "./sampleData/", filePattern =
-#' ".txt.gz", indVars = c("AllSubs", "Coverage-q25", "MeanQ",
-#' "BaseCount[A,C,G,T]", "Frequency", "Pvalue"), IDcol = c("Region", "Position",
-#' "Reference", "Strand"))
+#' out <- MergeIndividualFiles(
+#' fileDirectory = paste0(path.package("MultiDataAnalysis"), "/extdata/"),
+#' filePattern = ".txt.gz", indVars = c("AllSubs", "Coverage-q25", "MeanQ",
+#' "BaseCount[A,C,G,T]", "Frequency", "Pvalue"),
+#' IDcol = c("Region", "Position", "Reference", "Strand"))
 #' }
 #' @export
 
