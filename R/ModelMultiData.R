@@ -71,7 +71,7 @@
 #' @return A data.table with model coefficients for all variables in returnVars
 #'   for all unique tests in comparisons. Includes comparison, variable name,
 #'   Estimate, Std. Error, t- or z-value, pValue, and adjusted pValue.
-#' @example ./extdata/ModelMultiDataRunExample.R
+#' @example ./inst/extdata/ModelMultiDataRunExample.R
 #' @export
 
 ModelMultiData <- function(x, y = NULL, groups = NULL, by = NULL,
