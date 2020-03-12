@@ -1,14 +1,14 @@
-#' Check formula for singular values 
+#' Check formula for singular values
 #'
 #' \code{CheckFormulaLevels} is an internal function that tests that all
 #' variables in formula have more than one value.
-#' 
+#'
 #' This function checks all variables in formula for singular values, which
 #' usually cause errors when modeling, and drops singular variables.
 #'
-#' @param formula Formula to be used in model. 
-#' @param dt data.table with model data. 
-#' @return formula with singular values dropped. 
+#' @param formula Formula to be used in model.
+#' @param dt data.table with model data.
+#' @return formula with singular values dropped.
 
 CheckFormulaLevels <- function(formula, dt){
   formula.vars <- all.vars(formula)
@@ -20,8 +20,8 @@ CheckFormulaLevels <- function(formula, dt){
     }
   }
   if (!is.null(dropVars)){
-    warning(paste0("The following variables have singular value: ",
-                   dropVars))
+    warning(paste0("Warning: The following variables have singular value: ",
+                   paste0(c(dropVars), collapse = ", "), "\n"))
     formula <- as.formula(
       paste(formula.vars[1], "~",
             paste(setdiff(formula.vars[-1], dropVars), collapse = "+")))

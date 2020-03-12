@@ -15,7 +15,8 @@ CheckReturnVars <- function(returnVars, formula){
   formula.vars <- all.vars(formula)
   for (v in returnVars){
     if (!any(grepl(v, formula.vars[-1]))){
-      stop(paste0("Pattern ", v, "did not match any variable in formula"))
+      stop(paste0("Error: Pattern ", v,
+                  "did not match any variable in formula\n"))
     }
   }
 }

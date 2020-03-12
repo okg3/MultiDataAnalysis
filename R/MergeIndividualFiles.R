@@ -37,7 +37,7 @@ MergeIndividualFiles <- function(fileDirectory, filePattern = NULL,
                                  filePrefix = NULL, indVars = "auto",
                                  IDcol = 1, ...){
   if (missing(fileDirectory)){
-    stop("fileDirectory undefined with no default")
+    stop("Error: fileDirectory undefined with no default\n")
   }
   fileList <- list.files(path = fileDirectory, pattern = filePattern)
   file <- fileList[1]
@@ -64,7 +64,7 @@ MergeIndividualFiles <- function(fileDirectory, filePattern = NULL,
     } else if (is.character(indVars)){
       indCols <- match(indVars, colnames(temp_dataset))
     } else {
-      stop("indVars must be of class numeric or character")
+      stop("Error: indVars must be of class numeric or character\n")
     }
   } else {
     indVars = colnames(temp_dataset)[-IDcolShift]

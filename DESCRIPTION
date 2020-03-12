@@ -18,3 +18,7 @@ LazyData: true
 RoxygenNote: 7.0.2
 Depends: 
     data.table
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

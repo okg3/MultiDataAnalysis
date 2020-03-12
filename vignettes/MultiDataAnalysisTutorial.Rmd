@@ -1,0 +1,349 @@
+---
+title: "MultiDataAnalysisTutorial"
+author: "Olivia Gardner"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MultiDataAnalysisTutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(MultiDataAnalysis)
+```
+
+This package facilitates combining data from multiple files, experiments, or datasets into one analysis. In particular, this package has two main functionalities: 1. Merging files that are split by sample into one data set by experiment/measurement type, and 2. Applying a regression model to all rows of one or more matrices using data from multiple data sets. In this tutorial, we will explore different applications and parameters for these functions. 
+
+
+# Merging Data from Multiple Files into One Data Set 
+
+The MergeIndividualFiles function reads in files containing data from individual samples and merges individual data into one dataset by variable or measurement. 
+
+For this example, we will use data that has been installed with the MultiDataAnalysis package in the extdata/ folder. You can also download these files directly from github: https://github.com/okg3/MultiDataAnalysis/tree/master/inst/extdata 
+
+We will be looking at sample data from an RNA editing experiment using 8 samples. 
+
+```{r}
+# set dirPath to extdata directory in package path 
+dirPath <- paste0(path.package("MultiDataAnalysis"), "/extdata/")
+```
+```{r}
+dirPath
+# Data is split into separate files by sample
+list.files(dirPath, pattern = ".txt.gz")
+```
+
+Let's load one file to look at values: 
+
+```{r}
+file1 <- fread(paste0(dirPath, "sample1.txt.gz"))
+head(file1)
+```
+
+In this data, the unique editing events are identified by the columns Region, Position, Reference, and Strand. 
+
+```{r}
+idCols <- c("Region", "Position", "Reference", "Strand")
+```
+
+The columns AllSubs, Coverage-q25, MeanQ, BaseCount[A,C,G,T], Frequency, and Pvalue all represent individual meansurements that are specific to this sample. In order to compare measurements across samples, we will want to combine all of the Frequency columns from different samples into one matrix, all Coverage columns into another matrix, etc. 
+
+```{r}
+IndVars <- c("AllSubs", "Coverage-q25", "MeanQ", "BaseCount[A,C,G,T]", 
+             "Frequency", "Pvalue")
+```
+
+The remaining columns are annotations of the unique editing events which we will want to keep in a separate annotation data.frame. 
+
+To combine these datasets, we will use the MergeIndividualFiles function: 
+
+```{r}
+out <- MergeIndividualFiles(
+  fileDirectory = dirPath,
+  filePattern = ".txt.gz", 
+  indVars = IndVars,
+  IDcol = idCols
+)
+names(out)
+```
+
+Our merged dataset is a list containing one Annotation data.frame and 6 matrices with individual sample values for the 6 variables defined in indVars. 
+
+```{r}
+head(out$Annotation)
+
+head(out$Frequency)
+```
+
+Each matrix has 8 columns names after the file names, after removing the pattern defined in filePattern. Matrix rownames match the id column in the Annotation data.frame. 
+
+# Regression Model with Multiple Data Sets 
+
+The ModelMultiData function applies a regression model across all rows of one or more matrices with inputs from multiple data sets and returns the summary regression coefficients.
+
+## Working with Multiple Data Sets 
+
+This function accepts four main inputs: 
+
+* x: A matrix or list of matrices whose rows contain iterative values for models 
+* y: A matrix whose rows contain values to be used on left-hand side of model (for example, in a QTL analysis)
+* groups: A data.frame with additional information regarding the samples in column names of x and y, such as disease affection status, sequencing batch, height, weight, etc. 
+* comparisons (Optional): A matrix that specifies which combinations of rows in x and y should be tested together. See **Defining Comparisons** section below for more details. 
+
+To use this function, x must be supplied, and at least one of y or groups must also be defined. 
+
+### One x matrix vs groups 
+Here, we loop through all rows of a single x matrix and test for association with a groups object. 
+
+```{r}
+head(xExample1)
+dim(xExample1)
+groupsExample1
+```
+
+Note that the first column of the groups object matches the column names in x. Each row of x represents a separate measurement or observation. We can loop through all observations in x and test against the second column of groups by running: 
+
+```{r}
+# One x dataset vs groups
+out <- ModelMultiData(x = xExample1, groups = groupsExample1)
+head(out)
+```
+
+By default, if no formula is provided, ModelMultiData will build a formula using the provided data. If groups is defined and y is not, then the left-hand variable defaults to the second column of groups. To further modify the model formula, see the section **Adjusting the Model** below. 
+
+### One x matrix vs y matrix 
+
+By contrast, we may wish to loop through all rows of an x matrix and test for associations with rows of a y matrix. 
+
+```{r}
+head(xExample1)
+dim(xExample1)
+head(yExample1)
+dim(yExample1)
+```
+
+Note that x and y both share the same column names. 
+
+By default, if x and y have the same row names, the function assumes that rows that share the same name should be grouped together: 
+```{r}
+out <- ModelMultiData(x = xExample1, y = yExample1)
+head(out)
+```
+
+If x and y have different row names, the function tests all possible combinations of x and y: 
+```{r}
+out <- ModelMultiData(x = xExample1, y = yExample2)
+head(out)
+```
+
+To specify combinations, see **Defining Comparisons** below. 
+
+### List of x matrices 
+
+We can use multiple iterative data sets in the same model by providing a list of matrices to x. For example, we may want to test for associations between an outcome of interest and all measurements in x[[1]] while correcting for measurements in x[[2]]. 
+
+By default, if all rows in x[[1]] and x[[2]] have the same row names, the function assumes that rows that share the same name should be grouped together. If the x matrices share row names but differ from y, we group the x's by row name and test against all combinations with y. Else, we test all possible combinations of x and y: 
+
+```{r}
+# List of x datasets vs y - same rownames
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1)
+dim(out)
+
+# List of x datasets vs y - y rownames differ, x rownames identical
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample2)
+dim(out)
+
+# List of x datasets vs y - x and y rownames differ
+out <- ModelMultiData(x = list(xExample1, xExample3), y = yExample2)
+dim(out)
+head(out)
+```
+
+Here, the first three columns of the output report the names of the rows from each dataset that were used in the model. The variable column indicates the name of the coefficient in the model. By default, the function returns coefficients for values in x, but we can specify desired coefficients using the returnVars parameter (see **Changing Return Variables** below). 
+
+### Combining x, y, and groups
+
+To test for associations between rows of x and y while adjusting for factors in groups, such as batch, we can simply add groups: 
+
+```{r}
+# x vs y with groups
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1,
+                      groups = groupsExample1)
+head(out)
+```
+
+### Mismatching columns 
+
+Columns of x and y will be dropped if their column names are not shared across all matrices in x and y and, if defined, in the first column of groups.
+
+```{r}
+# x vs y with groups - mismatching columns
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample3,
+                      groups = groupsExample2)
+```
+
+## Defining Comparisons 
+
+The comparisons parameter allows users to pre-define which combinations of rows in x and y should be tested.  Column names should match data set names provided in xName (or default xName values) and in yName if y is provided. Each row should include the respective rownames or row numbers from each dataset in x and y that should be tested together. 
+
+```{r}
+# Supply comparisons matrix
+head(comparisonsExample)
+
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1,
+                      groups = groupsExample1,
+                      comparisons = comparisonsExample)
+head(out)
+
+# Supply comparisons matrix for a list of x matrices with xName defined
+head(comparisonsExample2)
+
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1,
+                      groups = groupsExample1, xName = c("test1", "test2"),
+                      comparisons = comparisonsExample2)
+head(out)
+
+# Supply comparisons matrix for named list of x matrices
+head(comparisonsExample2)
+
+out <- ModelMultiData(x = list(test1 = xExample1, test2 = xExample2), 
+                      y = yExample1, groups = groupsExample1, 
+                      comparisons = comparisonsExample2)
+head(out)
+
+# Supply comparisons matrix with row numbers rather than names 
+head(comparisonsExample3)
+
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1,
+                      groups = groupsExample1, 
+                      comparisons = comparisonsExample3)
+head(out)
+
+```
+
+
+## Adjusting the Model
+
+If no formula is provided, a formula will be built from provided data, but this formula can be adjusted using yName, xName, includeVars, and excludeVars. The left-hand (dependent) variable will be set to yName. 
+
+yName default values are: 
+
+* "y" if y is defined
+* else the left-hand variable will be defined as the second column of groups after applying includeVars and excludeVar  
+
+If yName is defined, the left-hand variable will be defined as the column of groups that matches yName. 
+
+xName provides the names of the matrices supplied to x. Defining xName can be helpful for interpreting output or when providing your own formula. 
+
+includeVars should be a character vector including column names in groups that should be included in the formula, and excludeVars is a character vector including column names in groups that should be excluded from formula. 
+
+The right-hand of formula will include all in xName and all remaining columns in groups after applying includeVars and excludeVars.
+
+```{r}
+# x vs groups - change yName
+out <- ModelMultiData(x = xExample1, groups = groupsExample1, yName = "batch")
+
+# x vs groups - exclude variables
+out <- ModelMultiData(x = xExample1, groups = groupsExample1, yName = "batch",
+                      excludeVars = "measure")
+
+# x vs groups - include variables
+out <- ModelMultiData(x = xExample1, groups = groupsExample1, yName = "batch",
+                      includeVars = "group")
+
+```
+
+
+Alternatively, the user may provide a formula. Of note, this formula should include all values in yName and xName. 
+
+```{r}
+# supply formula - x vs groups
+out <- ModelMultiData(x = xExample1, groups = groupsExample1,
+                      formula = measure ~ x + batch,
+                      xName = "x")
+
+# supply formula - list of x vs y - x names not provided
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1,
+                      formula = y ~ x1 + x2)
+
+# supply formula - list of x vs y - xNames provided
+out <- ModelMultiData(x = list(test1 = xExample1, test2 = xExample2), 
+                      y = yExample1,
+                      formula = y ~ test1 + test2)
+
+out <- ModelMultiData(x = list(xExample1, xExample2), 
+                      y = yExample1,
+                      formula = y ~ test1 + test2, 
+                      xName = c("test1", "test2"))
+
+# supply formula - list of x vs y - yName changed to match formula
+out <- ModelMultiData(x = list(xExample1, xExample2), 
+                      y = yExample1, yName = "outcome", 
+                      formula = outcome ~ x1 + x2)
+
+# supply formula - x vs y with groups
+out <- ModelMultiData(x = list(xExample1, xExample2), y = yExample1,
+                      groups = groupsExample1,
+                      formula = y ~ x1 + x2 + batch)
+```
+
+## Changing model function 
+
+By default, the ModelMultiData function applies a linear model. However, we can apply any function in the regression model function family by defining FUN. Additional parameters for these functions can be added to function call and will be passed to function in FUN. 
+
+For example, if we want to run a logistic regression we can define FUN as glm() and add the parameter family = binomial().  
+
+```{r}
+# x vs groups - change yName
+out <- ModelMultiData(x = xExample1, groups = groupsExample1, 
+                      formula = group ~ x1,
+                      FUN = glm, family = binomial())
+head(out)
+```
+
+
+
+
+## Changing Return Variables 
+
+By default, ModelMultiData returns all coefficients for variables in xName. To return different or additional variables, we can supply a character vector of coefficient variable names to returnVars. To return all coefficients (including intercept), use "*".
+
+```{r}
+# Change return variable to batch
+out <- ModelMultiData(x = xListUnnamedExample, y = yExample1,
+                      groups = groupsExample1,
+                      formula = y ~ x1 + x2 + batch,
+                      returnVars = "batch")
+head(out)
+
+# Change return variable to include all
+out <- ModelMultiData(x = xListUnnamedExample, y = yExample1,
+                      groups = groupsExample1,
+                      formula = y ~ x1 + x2 + batch,
+                      returnVars = "*")
+head(out)
+```
+
+
+
+## Stratified Analysis Using "by"
+
+We can use the "by" parameter to conduct a stratified analysis, splitting data by one or more variables in groups. We supply a character vector specifying the names of the column or columns in groups that will be used to split data if stratified analysis desired. 
+
+```{r}
+# x vs y with groups and one by parameter
+out <- ModelMultiData(x = xListUnnamedExample, y = yExample1,
+                      groups = groupsExample1,
+                      formula = y ~ x1 + x2 + measure,
+                      by = "group")
+```
+
+

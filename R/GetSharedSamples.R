@@ -5,9 +5,9 @@
 #' ModelMultiData function.
 #'
 #' @param x matrix or list of matrices
-#' @param y matrix 
-#' @param groups data.frame or data.table with groups data 
-#' @return vector of shared sample names 
+#' @param y matrix
+#' @param groups data.frame or data.table with groups data
+#' @return vector of shared sample names
 
 GetSharedSamples <- function(x, y = NULL, groups = NULL){
   sampleNames <- colnames(x[[1]])
@@ -23,7 +23,7 @@ GetSharedSamples <- function(x, y = NULL, groups = NULL){
     sampleNames <- intersect(sampleNames, groups[[1]])
   }
   if(length(sampleNames) == 0){
-    stop("length of shared sample names is 0")
+    stop("Error: length of shared sample names is 0\n")
   }
   sampleNames
 }

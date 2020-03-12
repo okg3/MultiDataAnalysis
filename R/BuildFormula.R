@@ -10,7 +10,7 @@
 #' groups after applying includeVars and excludeVars. The right-hand of formula
 #' will include all in xName and all remaining columns in groups after applying
 #' includeVars and excludeVars.
-#' 
+#'
 #' @param x A matrix or list of matrices containing values for model.
 #' @param y A matrix containing values to be used on left-hand side of model
 #'   (e.g. dependent variable). At least one of y or groups must be provided.
@@ -36,13 +36,14 @@ BuildFormula <- function(x, y = NULL, groups = NULL, by = NULL,
                          excludeVars = NULL, includeVars = NULL){
   if (is.null(groups) & (!is.null(excludeVars) |
                          !is.null(includeVars))){
-    warning(paste0("Arguments excludeVars and includeVars",
-                   " if groups is null."))
+    warning(paste0("Warning: Arguments excludeVars and includeVars",
+                   " ignored if groups is null.\n"))
   }
   if (length(yName) > 1){
     yName <- yName[1]
-    warning(paste0(length(yName), " arguments passed to yName",
-                   "which requires 1. Only the first will be used."))
+    warning(paste0("Warning: ",
+                   length(yName), " arguments passed to yName, ",
+                   "which requires 1. Only the first will be used.\n"))
   }
   if (!is.null(groups)) {
     include <- colnames(groups)[-1]
@@ -56,15 +57,16 @@ BuildFormula <- function(x, y = NULL, groups = NULL, by = NULL,
     if (is.null(y)){
       if (yName != "auto"){
         if (!(yName %in% colnames(groups))){
-          stop(paste0(yName, " not found in colnames(groups)"))
+          stop(paste0("Error: ", yName, " not found in colnames(groups)\n"))
         }
         include <- setdiff(include, yName)
       } else {
         yName <- include[1]
         include <- include[-1]
-        warning(paste0("y missing. Default value is second column of  ",
-                       "groups, post inclusion/exclusion criteria: ",
-                       yName))
+        warning(paste0("Warning: yName missing. ",
+                       "Default value is second column of groups,",
+                       " post inclusion/exclusion criteria: ",
+                       yName, "\n"))
       }
     }
   } else {
@@ -74,8 +76,8 @@ BuildFormula <- function(x, y = NULL, groups = NULL, by = NULL,
   formula.vars <- unique(c(yName, include, xName))
   formula <- as.formula(
     paste(formula.vars[1], "~", paste(formula.vars[-1], collapse = "+")))
-  warning(paste0("argument \"formula\" undefined. ",
+  warning(paste0("Warning: argument \"formula\" undefined. ",
                  "Using formula constructed from provided data: ",
-                 deparse(formula)))
+                 deparse(formula), "\n"))
   return(as.formula(formula))
 }

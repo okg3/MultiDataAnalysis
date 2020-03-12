@@ -80,11 +80,11 @@ ModelMultiData <- function(x, y = NULL, groups = NULL, by = NULL,
                            returnVars = "auto", comparisons = NULL,
                            excludeVars = NULL, includeVars = NULL, ...){
   if (missing(x)){
-    stop(paste0("argument \"x\" is missing, with no default"))
+    stop(paste0("Error: argument \"x\" is missing, with no default\n"))
   } else {
     x <- CheckXClass(x)
   }
-  if (xName == "auto"){
+  if (xName[1] == "auto"){
     if (is.null(names(x))){
       xName <- paste0("x", 1:length(x))
       names(x) <- xName
@@ -93,13 +93,13 @@ ModelMultiData <- function(x, y = NULL, groups = NULL, by = NULL,
     }
   } else {
     if (length(xName) != length(x)){
-      stop("xName does not have the same length as x")
+      stop("Error: xName does not have the same length as x\n")
     } else {
       names(x) <- xName
     }
   }
   if (is.null(y) & is.null(groups)){
-    stop("At least one of \"groups\" or \"y\" must be defined")
+    stop("Error: At least one of \"groups\" or \"y\" must be defined\n")
   }
   if (!is.null(groups)){
     groups <- CheckGroups(groups)
@@ -111,15 +111,23 @@ ModelMultiData <- function(x, y = NULL, groups = NULL, by = NULL,
   for (i in 1:length(x)){
     if (length(sampleNames) != ncol(x[[i]])){
       warning(
-        paste0("Names not identical. Columns dropped from list element ",
-               i, " of x: ", setdiff(sampleNames, colnames(x[[i]]))))
+        paste0("Warning: Names not identical. ",
+               "Columns dropped from list element ",
+               i, " of x: ", paste0(
+                 c(colnames(x[[i]])[!(colnames(x[[i]]) %in% sampleNames)]),
+                 collapse = ", "
+               ), "\n"))
     }
     x[[i]] <- x[[i]][, sampleNames]
   }
   if (!is.null(y)){
     if (length(sampleNames) != ncol(y)){
-      warning(paste0("Names not identical. Columns dropped from y: ",
-                     setdiff(sampleNames, colnames(y))))
+      warning(paste0("Warning: Names not identical. ",
+                     "Columns dropped from y: ",
+                     paste0(
+                       c(colnames(y)[!(colnames(y) %in% sampleNames)]),
+                       collapse = ", "
+                     ), "\n"))
     }
     y <- y[, sampleNames]
   }
@@ -147,27 +155,32 @@ ModelMultiData <- function(x, y = NULL, groups = NULL, by = NULL,
     comparisons <- BuildComparisons(x = x, y = y, xName = xName, yName = yName)
   } else {
     if (class(comparisons) != "matrix"){
-      warning("Coercing comparisons to matrix: some data may be lost")
+      warning("Warning: Coercing comparisons to matrix: ",
+              "some data may be lost\n")
       comparisons <- as.matrix(comparisons)
     }
     if (ncol(comparisons) != (length(x) + ifelse(is.null(y), 0, 1))){
-      stop(paste0("Number of columns in comparisons does not match ",
-                  "length(x) + ifelse(is.null(y), 0, 1))"))
+      stop(paste0("Error: Number of columns in comparisons does not match ",
+                  "length(x) + ifelse(is.null(y), 0, 1))\n"))
     }
   }
   if (!all(colnames(comparisons) %in% formula.vars)){
     stop(paste0(
-      "The following variables from comparisons are missing in formula: ",
-      colnames(comparisons)[!(colnames(comparisons) %in% formula.vars)]))
+      "Error: The following variables from comparisons",
+      " are missing in formula: ",
+      colnames(comparisons)[!(colnames(comparisons) %in% formula.vars)],
+      "\n"))
   }
   FUN <- match.fun(FUN)
   if (is.null(groups) & !is.null(by)){
-    warning(paste0("When groups object not provided, by is ignored."))
+    warning(paste0("Warning: When groups object not provided,",
+                   " by is ignored.\n"))
     by <- NULL
   } else if (!is.null(groups) & !is.null(by)){
     if (!(all(by %in% colnames(groups)))){
-      stop(paste0(by[!(by %in% colnames(groups))],
-                  " not found in colnames(groups)"))
+      stop("Warning: ",
+           paste0(by[!(by %in% colnames(groups))],
+                  " not found in colnames(groups)\n"))
     }
   }
   if (!is.null(by)){
@@ -197,6 +210,9 @@ ModelMultiData <- function(x, y = NULL, groups = NULL, by = NULL,
       colnames(r)[grep("pAdjust", colnames(r))]<- pAdjust
       r
     })
+  }
+  if(length(result) == 1){
+    result <- result[[1]]
   }
   return(result)
 }

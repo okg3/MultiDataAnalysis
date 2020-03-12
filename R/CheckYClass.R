@@ -5,18 +5,18 @@
 #'
 #' @param y A matrix containing values to be used on left-hand side of model
 #'   (e.g. dependent variable).
-#' @return matrix 
+#' @return matrix
 
 CheckYClass <- function(y){
-  if (class(y) != "matriy"){
-    warning("Coercing y to matrix: some data may be lost")
+  if (class(y) != "matrix"){
+    warning("Warning: Coercing y to matrix: some data may be lost\n")
     y <- as.matrix(y)
   }
   if(is.null(rownames(y))){
     rownames(y) <- seq_len(nrow(y))
   }
   if(is.null(colnames(y))){
-    stop("column names missing from y")
+    stop("Error: column names missing from y\n")
   }
   y
 }
