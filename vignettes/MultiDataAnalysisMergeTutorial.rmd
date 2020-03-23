@@ -1,0 +1,87 @@
+---
+title: "MultiDataAnalysis Tutorial - Merge Individual Files"
+author: "Olivia Gardner"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MultiDataAnalysisTutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(MultiDataAnalysis)
+```
+
+This package facilitates combining data from multiple files, experiments, or datasets into one analysis. In particular, this package has two main functionalities: 1. Merging files that are split by sample into one data set by experiment/measurement type, and 2. Applying a regression model to all rows of one or more matrices using data from multiple data sets. In this tutorial, we will explore different applications and parameters for the function MergeIndividualFiles. 
+
+
+# Merging Data from Multiple Files into One Data Set 
+
+The MergeIndividualFiles function reads in files containing data from individual samples and merges individual data into one dataset by variable or measurement. 
+
+For this example, we will use data that has been installed with the MultiDataAnalysis package in the extdata/ folder. You can also download these files directly from github: https://github.com/okg3/MultiDataAnalysis/tree/master/inst/extdata 
+
+We will be looking at sample data from an RNA editing experiment using 8 samples. 
+
+```{r}
+# set dirPath to extdata directory in package path 
+dirPath <- paste0(path.package("MultiDataAnalysis"), "/extdata/")
+```
+```{r}
+dirPath
+# Data is split into separate files by sample
+list.files(dirPath, pattern = ".txt.gz")
+```
+
+Let's load one file to look at values: 
+
+```{r}
+file1 <- fread(paste0(dirPath, "sample1.txt.gz"))
+head(file1)
+```
+
+In this data, the unique editing events are identified by the columns Region, Position, Reference, and Strand. 
+
+```{r}
+idCols <- c("Region", "Position", "Reference", "Strand")
+```
+
+The columns AllSubs, Coverage-q25, MeanQ, BaseCount[A,C,G,T], Frequency, and Pvalue all represent individual meansurements that are specific to this sample. In order to compare measurements across samples, we will want to combine all of the Frequency columns from different samples into one matrix, all Coverage columns into another matrix, etc. 
+
+```{r}
+IndVars <- c("AllSubs", "Coverage-q25", "MeanQ", "BaseCount[A,C,G,T]", 
+             "Frequency", "Pvalue")
+```
+
+The remaining columns are annotations of the unique editing events which we will want to keep in a separate annotation data.frame. 
+
+To combine these datasets, we will use the MergeIndividualFiles function: 
+
+```{r}
+out <- MergeIndividualFiles(
+  fileDirectory = dirPath,
+  filePattern = ".txt.gz", 
+  indVars = IndVars,
+  IDcol = idCols
+)
+names(out)
+```
+
+Our merged dataset is a list containing one Annotation data.frame and 6 matrices with individual sample values for the 6 variables defined in indVars. 
+
+```{r}
+head(out$Annotation)
+
+head(out$Frequency)
+```
+
+Each matrix has 8 columns names after the file names, after removing the pattern defined in filePattern. Matrix rownames match the id column in the Annotation data.frame. 
+

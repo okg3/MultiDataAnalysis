@@ -1,5 +1,5 @@
 Package: MultiDataAnalysis
-Title: Combine data from multiple files or experiments into one analysis
+Title: Combine Data from Multiple Files or Experiments into One Analysis
 Version: 0.1.0
 Authors@R: 
     person(given = "Olivia",
