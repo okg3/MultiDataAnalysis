@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Olivia Gardner" />
+
+<meta name="date" content="2020-03-23" />
+
+<title>MultiDataAnalysis Tutorial - Model Multi Data</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">MultiDataAnalysis Tutorial - Model Multi Data</h1>
+<h4 class="author">Olivia Gardner</h4>
+<h4 class="date">2020-03-23</h4>
+
+
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MultiDataAnalysis)
+<span class="co">#&gt; Loading required package: data.table</span></code></pre></div>
+<p>This package facilitates combining data from multiple files, experiments, or datasets into one analysis. In particular, this package has two main functionalities: 1. Merging files that are split by sample into one data set by experiment/measurement type, and 2. Applying a regression model to all rows of one or more matrices using data from multiple data sets. In this tutorial, we will explore different applications and parameters for the function ModelMultiData. We will be using an example of a differential RNA Editing analysis to demonstrate.</p>
+<div id="regression-model-with-multiple-data-sets" class="section level1">
+<h1>Regression Model with Multiple Data Sets</h1>
+<p>To test for associations between RNA Editing and a trait at every edited site, we can use the ModelMultiData function from the MultiDataAnalysis package. The ModelMultiData function applies a regression model across all rows of one or more matrices with inputs from multiple data sets and returns the summary regression coefficients.</p>
+<div id="association-between-rna-editing-at-each-site-and-age" class="section level2">
+<h2>Association between RNA Editing at Each Site and Age</h2>
+<p>First, let’s test if RNA Editing frequency at any site is associated with age using a linear model, adjusting for batch. To do this, we supply the RNA Editing Frequency matrix to x and the RNAEdSampleInfo data.frame to groups. Because we don’t want to include status as a covariate, we will add that to the excludeVars parameter.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">ModelMultiData</span>(<span class="dt">x =</span> RNAEdDataQCed<span class="op">$</span>Frequency, <span class="dt">groups =</span> RNAEdSampleInfo,
+                      <span class="dt">excludeVars =</span> <span class="st">&quot;status&quot;</span>)
+<span class="co">#&gt; Warning in BuildFormula(x = x, y = y, groups = groups, by = by, xName = xName, : Warning: yName missing. Default value is second column of groups, post inclusion/exclusion criteria: age</span>
+<span class="co">#&gt; Warning in BuildFormula(x = x, y = y, groups = groups, by = by, xName = xName, : Warning: argument &quot;formula&quot; undefined. Using formula constructed from provided data: age ~ batch + x1</span>
+out &lt;-<span class="st"> </span>out[<span class="kw">order</span>(out<span class="op">$</span>fdr), ]
+<span class="kw">head</span>(out)
+<span class="co">#&gt;                    x1 variable  Estimate Std. Error   t value       pValue</span>
+<span class="co">#&gt; 1: chr16_67995842_A_0       x1 -63.67663  11.222047 -5.674244 0.0023665318</span>
+<span class="co">#&gt; 2:  chr1_36478030_A_0       x1 -62.45989  11.160877 -5.596325 0.0025154764</span>
+<span class="co">#&gt; 3: chr2_200994412_A_0       x1 -39.02631   5.248331 -7.435947 0.0006933415</span>
+<span class="co">#&gt; 4:  chr2_40200622_A_0       x1 -47.16647   7.380685 -6.390528 0.0013897464</span>
+<span class="co">#&gt; 5: chr11_65442619_A_1       x1 -73.67576  16.502177 -4.464609 0.0066121749</span>
+<span class="co">#&gt; 6:  chr12_9659679_A_1       x1 106.46259  24.712236  4.308092 0.0076564632</span>
+<span class="co">#&gt;          fdr</span>
+<span class="co">#&gt; 1: 0.6288691</span>
+<span class="co">#&gt; 2: 0.6288691</span>
+<span class="co">#&gt; 3: 0.6288691</span>
+<span class="co">#&gt; 4: 0.6288691</span>
+<span class="co">#&gt; 5: 0.8507181</span>
+<span class="co">#&gt; 6: 0.8507181</span></code></pre></div>
+<p>By default, if no formula is provided, ModelMultiData will build a formula using the provided data. If groups is defined and y is not, then the left-hand variable defaults to the second column of groups after applying excludeVars and includeVars. The remaining columns in groups post-includsion/exclusion criteria are included as covariates in the model. We can also supply the formula directly, as seen below.</p>
+</div>
+<div id="association-between-rna-editing-at-each-site-and-case-control-status" class="section level2">
+<h2>Association between RNA Editing at Each Site and Case Control Status</h2>
+<p>While ModelMultiData applies a linear model by default, we can also test binary traits with a logistic regression by changing the FUN parameter to glm and supplying family = binomial(). Here, we are interested in testing for associations between RNA Editing Frequency and case-control status, so we supply the formula status ~ frequency and note that “frequency” refers to the rows of our x matrix (RNAEdDataQCed$Frequency) by setting xName.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">ModelMultiData</span>(<span class="dt">formula =</span> status <span class="op">~</span><span class="st"> </span>frequency, <span class="dt">x =</span> RNAEdDataQCed<span class="op">$</span>Frequency,
+                      <span class="dt">groups =</span> RNAEdSampleInfo, <span class="dt">xName =</span> <span class="st">&quot;frequency&quot;</span>, 
+                      <span class="dt">FUN =</span> glm, <span class="dt">family =</span> <span class="kw">binomial</span>())
+
+out &lt;-<span class="st"> </span>out[<span class="kw">order</span>(out<span class="op">$</span>fdr), ]
+<span class="kw">head</span>(out)
+<span class="co">#&gt;              frequency  variable    Estimate Std. Error    z value    pValue</span>
+<span class="co">#&gt; 1: chr10_100233036_A_0 frequency  -20.843614   22.02754 -0.9462524 0.3440199</span>
+<span class="co">#&gt; 2: chr10_101789717_A_0 frequency   31.895556   20.77391  1.5353664 0.1246939</span>
+<span class="co">#&gt; 3: chr10_101789903_A_0 frequency   13.523230   14.38668  0.9399826 0.3472265</span>
+<span class="co">#&gt; 4: chr10_101810887_A_0 frequency -109.545570   84.87162 -1.2907209 0.1968005</span>
+<span class="co">#&gt; 5: chr10_101810918_A_0 frequency  -21.437569   20.85311 -1.0280275 0.3039369</span>
+<span class="co">#&gt; 6: chr10_101811186_A_0 frequency    8.111318   13.12262  0.6181171 0.5364982</span>
+<span class="co">#&gt;         fdr</span>
+<span class="co">#&gt; 1: 0.936858</span>
+<span class="co">#&gt; 2: 0.936858</span>
+<span class="co">#&gt; 3: 0.936858</span>
+<span class="co">#&gt; 4: 0.936858</span>
+<span class="co">#&gt; 5: 0.936858</span>
+<span class="co">#&gt; 6: 0.936858</span></code></pre></div>
+</div>
+<div id="association-between-rna-editing-and-coverage-at-each-site" class="section level2">
+<h2>Association between RNA Editing and Coverage at Each Site</h2>
+<p>In addition to testing for associations with external traits using the groups parameter, we may want to test if the Frequency of RNA Editing tends to be strongly associated with Coverage at each site. In this case, we can supply the Coverage matrix to the y parameter. Because the supplied x matrix and y matrix both share the same the same rownames, ModelMultiData will by default pair rows with the same name and test for associations (if x and y do not have the same rownames, ModelMultiData will test all possible combinations unless comparisons parameter is supplied).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">ModelMultiData</span>(<span class="dt">x =</span> RNAEdDataQCed<span class="op">$</span>Frequency, 
+                      <span class="dt">y =</span> RNAEdDataQCed<span class="op">$</span><span class="st">`</span><span class="dt">Coverage-q25</span><span class="st">`</span>)
+<span class="co">#&gt; Warning in BuildFormula(x = x, y = y, groups = groups, by = by, xName = xName, : Warning: argument &quot;formula&quot; undefined. Using formula constructed from provided data: y ~ x1</span>
+
+out &lt;-<span class="st"> </span>out[<span class="kw">order</span>(out<span class="op">$</span>fdr), ]
+<span class="kw">head</span>(out)
+<span class="co">#&gt;                      y                  x1 variable   Estimate Std. Error</span>
+<span class="co">#&gt; 1: chr11_121532755_A_1 chr11_121532755_A_1       x1  -500.6557   86.79646</span>
+<span class="co">#&gt; 2:  chr12_31996866_A_1  chr12_31996866_A_1       x1   381.5309   72.64246</span>
+<span class="co">#&gt; 3:   chr16_3242106_A_0   chr16_3242106_A_0       x1 -1678.7234  324.08134</span>
+<span class="co">#&gt; 4:  chr17_59807646_A_0  chr17_59807646_A_0       x1   319.6919   62.08461</span>
+<span class="co">#&gt; 5:  chr1_150731200_A_0  chr1_150731200_A_0       x1  2587.5562  462.14164</span>
+<span class="co">#&gt; 6:  chr1_150731221_A_0  chr1_150731221_A_0       x1  2368.5904  455.06892</span>
+<span class="co">#&gt;      t value      pValue       fdr</span>
+<span class="co">#&gt; 1: -5.768158 0.001184871 0.2468712</span>
+<span class="co">#&gt; 2:  5.252175 0.001915779 0.2468712</span>
+<span class="co">#&gt; 3: -5.179945 0.002054450 0.2468712</span>
+<span class="co">#&gt; 4:  5.149294 0.002116714 0.2468712</span>
+<span class="co">#&gt; 5:  5.599055 0.001382069 0.2468712</span>
+<span class="co">#&gt; 6:  5.204905 0.002005280 0.2468712</span></code></pre></div>
+</div>
+<div id="association-between-case-control-status-and-rna-editing-adjusting-for-covariates" class="section level2">
+<h2>Association between Case-Control Status and RNA Editing Adjusting for Covariates</h2>
+<p>While it does not appear that coverage is strongly associated with frequency, we may still want to include coverage at each site as a covariate while testing for the association between case control status and frequency.</p>
+<p>To do this, we can supply a list of matrices to the x parameter. If we don’t supply xName, the names of the list items should correspond with the respective variables in the formula, in this case, frequency and coverage (otherwise, by default, x matrices will be named x1, x2,…, xn). Like the example above, this function will pair all rows in x1 and x2 that share the same name. This means that we can adjust the frequency of editing at every site by the coverage at those sites.</p>
+<p>In addition, we may want to change the variable coefficients that are returned. By default, ModelMultiData returns model coefficients for variables in x. However, to include all coefficients (including the intercept), we change the returnVars parameter to “*“.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">ModelMultiData</span>(<span class="dt">formula =</span> status <span class="op">~</span><span class="st"> </span>frequency <span class="op">+</span><span class="st"> </span>coverage <span class="op">+</span><span class="st"> </span>age, 
+                      <span class="dt">x =</span> <span class="kw">list</span>(<span class="dt">frequency =</span> RNAEdDataQCed<span class="op">$</span>Frequency, 
+                               <span class="dt">coverage =</span> RNAEdDataQCed<span class="op">$</span><span class="st">`</span><span class="dt">Coverage-q25</span><span class="st">`</span>), 
+                      <span class="dt">groups =</span> RNAEdSampleInfo, <span class="dt">FUN =</span> glm, <span class="dt">family =</span> <span class="kw">binomial</span>(),
+                      <span class="dt">returnVars =</span> <span class="st">&quot;*&quot;</span>)
+out &lt;-<span class="st"> </span>out[<span class="kw">order</span>(out<span class="op">$</span>fdr), ]
+<span class="kw">head</span>(out)
+<span class="co">#&gt;              frequency            coverage    variable      Estimate</span>
+<span class="co">#&gt; 1:  chr14_21460885_A_0  chr14_21460885_A_0 (Intercept) -2.489482e+15</span>
+<span class="co">#&gt; 2:  chr14_21460885_A_0  chr14_21460885_A_0   frequency  8.084430e+15</span>
+<span class="co">#&gt; 3:  chr14_21460885_A_0  chr14_21460885_A_0    coverage  3.294645e+13</span>
+<span class="co">#&gt; 4:  chr14_21460885_A_0  chr14_21460885_A_0         age -1.244158e+14</span>
+<span class="co">#&gt; 5: chr10_100233036_A_0 chr10_100233036_A_0 (Intercept) -9.297939e+00</span>
+<span class="co">#&gt; 6: chr10_100233036_A_0 chr10_100233036_A_0   frequency  1.494539e+01</span>
+<span class="co">#&gt;      Std. Error       z value    pValue       fdr</span>
+<span class="co">#&gt; 1: 6.623081e+08 -3.758797e+06 0.0000000 0.0000000</span>
+<span class="co">#&gt; 2: 4.947011e+08  1.634205e+07 0.0000000 0.0000000</span>
+<span class="co">#&gt; 3: 3.041684e+05  1.083165e+08 0.0000000 0.0000000</span>
+<span class="co">#&gt; 4: 5.965507e+06 -2.085586e+07 0.0000000 0.0000000</span>
+<span class="co">#&gt; 5: 1.629474e+01 -5.706098e-01 0.5682642 0.9999999</span>
+<span class="co">#&gt; 6: 4.075291e+01  3.667319e-01 0.7138190 0.9999999</span></code></pre></div>
+</div>
+<div id="association-between-rna-editing-and-age-stratified-by-case-control-status" class="section level2">
+<h2>Association between RNA Editing and Age Stratified by Case-Control Status</h2>
+<p>So far, we have tested for associations between RNA editing and traits with cases and control combined, but we might want to conduct a stratified analysis to test for associations within each group. We can use the “by” parameter to conduct a stratified analysis, splitting data by one or more variables in groups. We supply a character vector specifying the names of the column or columns in groups that will be used to split data if stratified analysis desired.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">ModelMultiData</span>(<span class="dt">formula =</span> age <span class="op">~</span><span class="st"> </span>frequency <span class="op">+</span><span class="st"> </span>coverage <span class="op">+</span><span class="st"> </span>batch, 
+                      <span class="dt">x =</span> <span class="kw">list</span>(<span class="dt">frequency =</span> RNAEdDataQCed<span class="op">$</span>Frequency, 
+                               <span class="dt">coverage =</span> RNAEdDataQCed<span class="op">$</span><span class="st">`</span><span class="dt">Coverage-q25</span><span class="st">`</span>), 
+                      <span class="dt">groups =</span> RNAEdSampleInfo, <span class="dt">by =</span> <span class="st">&quot;status&quot;</span>)
+out &lt;-<span class="st"> </span><span class="kw">lapply</span>(out, <span class="cf">function</span>(x) x[<span class="kw">order</span>(x<span class="op">$</span>fdr), ])
+<span class="kw">lapply</span>(out, head)
+<span class="co">#&gt; $case</span>
+<span class="co">#&gt;             frequency           coverage  variable     Estimate   Std. Error</span>
+<span class="co">#&gt; 1: chr12_31973338_A_1 chr12_31973338_A_1 frequency 250.00000000 3.825502e-13</span>
+<span class="co">#&gt; 2: chr12_31973338_A_1 chr12_31973338_A_1  coverage   0.04166667 1.111764e-16</span>
+<span class="co">#&gt; 3: chr13_50038460_A_0 chr13_50038460_A_0 frequency 100.28089888 4.335203e+00</span>
+<span class="co">#&gt; 4: chr13_50038460_A_0 chr13_50038460_A_0  coverage  -0.25561798 1.000548e-02</span>
+<span class="co">#&gt; 5: chr13_27651758_A_1 chr13_27651758_A_1 frequency  -8.33333333 8.333333e+00</span>
+<span class="co">#&gt; 6: chr16_29668318_A_1 chr16_29668318_A_1 frequency -14.20118343 8.756597e+00</span>
+<span class="co">#&gt;          t value       pValue          fdr</span>
+<span class="co">#&gt; 1:  6.535090e+14 9.741561e-16 1.868515e-14</span>
+<span class="co">#&gt; 2:  3.747798e+14 1.698650e-15 1.868515e-14</span>
+<span class="co">#&gt; 3:  2.313176e+01 2.750433e-02 1.512738e-01</span>
+<span class="co">#&gt; 4: -2.554779e+01 2.490606e-02 1.512738e-01</span>
+<span class="co">#&gt; 5: -1.000000e+00 5.000000e-01 6.292030e-01</span>
+<span class="co">#&gt; 6: -1.621770e+00 3.517602e-01 6.292030e-01</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $control</span>
+<span class="co">#&gt;             frequency           coverage  variable     Estimate  Std. Error</span>
+<span class="co">#&gt; 1: chr16_57182788_A_0 chr16_57182788_A_0 frequency  -81.6254417  27.8793884</span>
+<span class="co">#&gt; 2: chr16_57182788_A_0 chr16_57182788_A_0  coverage    0.6908127   0.2564882</span>
+<span class="co">#&gt; 3: chr19_14392641_A_1 chr19_14392641_A_1 frequency -517.3469388 158.3277617</span>
+<span class="co">#&gt; 4: chr19_14392641_A_1 chr19_14392641_A_1  coverage   -1.3877551   0.4786139</span>
+<span class="co">#&gt; 5:  chr2_37100939_A_0  chr2_37100939_A_0  coverage   -0.4249493   0.4117997</span>
+<span class="co">#&gt; 6:  chr3_28333961_A_0  chr3_28333961_A_0  coverage    1.1392405   1.3368671</span>
+<span class="co">#&gt;       t value    pValue       fdr</span>
+<span class="co">#&gt; 1: -2.9278060 0.2095304 0.4526487</span>
+<span class="co">#&gt; 2:  2.6933511 0.2263243 0.4526487</span>
+<span class="co">#&gt; 3: -3.2675693 0.1890677 0.4526487</span>
+<span class="co">#&gt; 4: -2.8995297 0.2114274 0.4526487</span>
+<span class="co">#&gt; 5: -1.0319321 0.4899963 0.7342711</span>
+<span class="co">#&gt; 6:  0.8521719 0.5507033 0.7342711</span></code></pre></div>
+</div>
+<div id="rna-editing-qtl-analysis" class="section level2">
+<h2>RNA Editing QTL Analysis</h2>
+<p>To conduct an RNA Editing QTL analysis, we can supply our RNA Editing frequency matrix to the y parameter and a genotypes matrix to x.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">RNAEdGenotypes
+<span class="co">#&gt;                 sample1 sample2 sample3 sample4 sample5 sample6 sample7 sample8</span>
+<span class="co">#&gt; chr10_100232946       1       2       1       0       1       1       0       2</span>
+<span class="co">#&gt; chr10_100233088       2       1       1       2       0       1       0       2</span>
+<span class="co">#&gt; chr10_101789760       2       2       2       2       2       2       0       1</span>
+<span class="co">#&gt; chr10_101789624       0       2       0       0       0       0       2       0</span>
+<span class="co">#&gt; chr10_101789720       1       0       1       2       1       2       2       0</span>
+<span class="co">#&gt; chr10_101789813       2       0       1       2       1       2       0       0</span>
+<span class="co">#&gt; chr10_101790370       1       2       0       1       1       0       0       0</span>
+<span class="co">#&gt; chr10_101801068       0       1       2       1       0       0       1       2</span>
+<span class="co">#&gt; chr10_101801191       2       0       0       2       0       1       2       1</span>
+<span class="co">#&gt; chr10_101801286       1       2       2       2       1       2       1       0</span></code></pre></div>
+<p>However, we may want to restrict the comparisons we are making to only test for associations between SNPs and editing sites that are within the same gene, etc. To do this, we can supply our desired comparisons to the comparisons parameter.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(RNAEdCombinations)
+<span class="co">#&gt;      x1                y                    </span>
+<span class="co">#&gt; [1,] &quot;chr10_100232946&quot; &quot;chr10_100233036_A_0&quot;</span>
+<span class="co">#&gt; [2,] &quot;chr10_100233088&quot; &quot;chr10_100233036_A_0&quot;</span>
+<span class="co">#&gt; [3,] &quot;chr10_100233088&quot; &quot;chr10_100233053_A_0&quot;</span>
+<span class="co">#&gt; [4,] &quot;chr10_101789760&quot; &quot;chr10_101789717_A_0&quot;</span>
+<span class="co">#&gt; [5,] &quot;chr10_101789760&quot; &quot;chr10_101789723_A_0&quot;</span>
+<span class="co">#&gt; [6,] &quot;chr10_101789760&quot; &quot;chr10_101789782_A_0&quot;</span></code></pre></div>
+<p>The comparisons parameter allows users to pre-define which combinations of rows in x and y should be tested. Column names should match data set names provided in xName (or default xName values) and in yName if y is provided. Each row should include the respective rownames or row numbers from each dataset in x and y that should be tested together.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">ModelMultiData</span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>age, 
+                      <span class="dt">x =</span> RNAEdGenotypes, <span class="dt">y =</span> RNAEdDataQCed<span class="op">$</span>Frequency, 
+                      <span class="dt">groups =</span> RNAEdSampleInfo, <span class="dt">comparisons =</span> RNAEdCombinations)
+out &lt;-<span class="st"> </span>out[<span class="kw">order</span>(out<span class="op">$</span>fdr), ]
+<span class="kw">head</span>(out)
+<span class="co">#&gt;                 x1                   y variable    Estimate Std. Error</span>
+<span class="co">#&gt; 1: chr10_101801191 chr10_101801270_A_0       x1 -0.11160274 0.02743023</span>
+<span class="co">#&gt; 2: chr10_100233088 chr10_100233036_A_0       x1  0.03368092 0.01494148</span>
+<span class="co">#&gt; 3: chr10_101801191 chr10_101801268_A_0       x1 -0.06020548 0.02416932</span>
+<span class="co">#&gt; 4: chr10_101801286 chr10_101801270_A_0       x1  0.10052644 0.05653922</span>
+<span class="co">#&gt; 5: chr10_101789720 chr10_101789723_A_0       x1  0.07007707 0.04806933</span>
+<span class="co">#&gt; 6: chr10_101789720 chr10_101789782_A_0       x1  0.06860308 0.04811296</span>
+<span class="co">#&gt;      t value      pValue       fdr</span>
+<span class="co">#&gt; 1: -4.068603 0.009647182 0.2122380</span>
+<span class="co">#&gt; 2:  2.254190 0.073887790 0.5418438</span>
+<span class="co">#&gt; 3: -2.490988 0.055094401 0.5418438</span>
+<span class="co">#&gt; 4:  1.777995 0.135544503 0.7454948</span>
+<span class="co">#&gt; 5:  1.457833 0.204683290 0.7818557</span>
+<span class="co">#&gt; 6:  1.425875 0.213233367 0.7818557</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

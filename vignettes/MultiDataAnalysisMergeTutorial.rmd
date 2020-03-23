@@ -70,7 +70,8 @@ out <- MergeIndividualFiles(
   fileDirectory = dirPath,
   filePattern = ".txt.gz", 
   indVars = IndVars,
-  IDcol = idCols
+  IDcol = idCols,
+  na.strings = "-"
 )
 names(out)
 ```
